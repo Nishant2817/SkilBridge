@@ -48,10 +48,12 @@ export const getGigById = async (req, res) => {
 
 // POST /api/gigs  — seller only
 export const createGig = async (req, res) => {
-  const { title, description, price, category, image } = req.body;
+  const { title, description, price, category, image, packages } = req.body;
+  
   if (!title || !description || !price || !category) {
     return res.status(400).json({ error: "title, description, price, and category are required." });
   }
+  
   try {
     const gig = await prisma.gig.create({
       data: {
@@ -59,7 +61,8 @@ export const createGig = async (req, res) => {
         description,
         price: parseInt(price, 10),
         category,
-        image: image || "", // required string now
+        image: image || "",
+        packages: packages || {},
         userId: req.user.userId,
       },
     });

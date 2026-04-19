@@ -2,14 +2,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import AuthModal from "./components/AuthModal";
 import GigDetail from "./pages/GigDetail";
 import Gigs from "./pages/Gigs";
 import AddGig from "./pages/AddGig";
 import SellerDashboard from "./pages/SellerDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Orders from "./pages/Orders";
+import Checkout from "./pages/Checkout";
 import MySales from "./pages/MySales";
 import AdminDashboard from "./pages/AdminDashboard";
 import Chat from "./pages/Chat";
@@ -19,14 +19,13 @@ import EditProfile from "./pages/EditProfile";
 function App() {
   return (
     <BrowserRouter>
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#0a0a0f" }}>
+      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "#ffffff" }}>
+        <AuthModal />
         <Navbar />
         <main style={{ flex: 1 }}>
           <Routes>
             {/* Public */}
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
             <Route path="/gigs" element={<Gigs />} />
             <Route path="/gigs/:id" element={<GigDetail />} />
 
@@ -38,6 +37,7 @@ function App() {
             <Route path="/create-gig" element={<ProtectedRoute><AddGig /></ProtectedRoute>} />
 
             {/* Orders & Fulfillment */}
+            <Route path="/checkout/:gigId" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
             <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
             <Route path="/my-sales" element={<ProtectedRoute><MySales /></ProtectedRoute>} />
 
@@ -66,11 +66,12 @@ function PlaceholderPage({ title }) {
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center",
-      justifyContent: "center", background: "#0a0a0f", flexDirection: "column", gap: "12px",
+      justifyContent: "center", background: "#f9fafb",
+      flexDirection: "column", gap: "12px", paddingTop: "80px",
     }}>
       <div style={{ fontSize: "3rem" }}>🚧</div>
-      <h1 style={{ color: "#e8e8f0", fontWeight: "800", fontSize: "1.6rem" }}>{title}</h1>
-      <p style={{ color: "#6b6b8a" }}>Coming in a future phase.</p>
+      <h1 style={{ color: "#111827", fontWeight: "800", fontSize: "1.6rem" }}>{title}</h1>
+      <p style={{ color: "#6b7280" }}>Coming in a future phase.</p>
     </div>
   );
 }

@@ -14,12 +14,6 @@ const CATEGORIES = [
   "Data",
 ];
 
-const CAT_ICONS = {
-  Design: "🎨", Development: "💻", Marketing: "📣",
-  Writing: "✍️", Video: "🎬", Music: "🎵",
-  Business: "💼", Data: "🤖",
-};
-
 export default function AddGig() {
   const navigate = useNavigate();
   const { token, isSeller } = useAuth();
@@ -27,29 +21,32 @@ export default function AddGig() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    price: "",
     category: CATEGORIES[0],
     image: "",
+    packages: {
+      basic: { price: "", revisions: "1", deliveryTime: "1 day", deliverables: "" },
+      standard: { price: "", revisions: "3", deliveryTime: "3 days", deliverables: "" },
+      premium: { price: "", revisions: "Unlimited", deliveryTime: "5 days", deliverables: "" }
+    }
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [preview, setPreview] = useState("");   // base64 data URL for preview
+  const [preview, setPreview] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  const [activeTab, setActiveTab] = useState("basic");
   const fileInputRef = useRef(null);
 
-  // Guard: non-sellers see access denied
   if (!isSeller) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0a0a0f", flexDirection: "column", gap: "12px" }}>
-        <div style={{ fontSize: "3rem" }}>🔒</div>
-        <h2 style={{ color: "#f87171", fontWeight: "800", fontSize: "1.5rem" }}>Sellers Only</h2>
-        <p style={{ color: "#6b6b8a", textAlign: "center", maxWidth: "320px" }}>
-          You need a seller account to post gigs. Activate it from the navbar menu.
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#fff", flexDirection: "column", gap: "12px" }}>
+        <h2 style={{ color: "#ef4444", fontWeight: "800", fontSize: "1.5rem" }}>Sellers Only</h2>
+        <p style={{ color: "#6b7280", textAlign: "center", maxWidth: "320px" }}>
+          You need a seller account to post gigs.
         </p>
         <button
           onClick={() => navigate("/")}
-          style={{ marginTop: "8px", padding: "10px 24px", background: "rgba(29,191,115,0.1)", border: "1px solid rgba(29,191,115,0.3)", color: "#1dbf73", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
+          style={{ marginTop: "8px", padding: "10px 24px", background: "#f0fdf4", border: "1px solid #dcfce7", color: "#059669", borderRadius: "8px", cursor: "pointer", fontWeight: "600" }}
         >
           ← Back to Home
         </button>
@@ -60,11 +57,23 @@ export default function AddGig() {
   const handleChange = (e) =>
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  // Read a File object → base64 data URL and store in formData.image
+  const handlePackageChange = (tier, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      packages: {
+        ...prev.packages,
+        [tier]: {
+          ...prev.packages[tier],
+          [field]: value
+        }
+      }
+    }));
+  };
+
   const readFile = (file) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setError("Please select a valid image file (JPG, PNG, GIF, WebP).");
+      setError("Please select a valid image file.");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
@@ -102,7 +111,10 @@ export default function AddGig() {
 
     try {
       await createGig(
-        { ...formData, price: Number(formData.price) },
+        { 
+          ...formData, 
+          price: Number(formData.packages.basic.price) 
+        },
         token
       );
       setSuccess(true);
@@ -114,273 +126,274 @@ export default function AddGig() {
     }
   };
 
-  // ── Shared input style
-  const input = {
-    width: "100%", padding: "13px 16px",
-    background: "rgba(255,255,255,0.03)",
-    border: "1px solid #1e1e2e",
-    color: "#e8e8f0", borderRadius: "10px",
-    fontSize: "0.95rem", outline: "none",
+  const inputStyle = {
+    width: "100%",
+    padding: "12px 14px",
+    background: "#fff",
+    border: "1px solid #94a3b8",
+    borderRadius: "6px",
+    color: "#334155",
+    fontSize: "0.95rem",
+    fontFamily: "inherit",
+    outline: "none",
     transition: "border-color 0.2s",
     boxSizing: "border-box",
+  };
+
+  const labelStyle = {
+    display: "block",
+    color: "#475569",
+    marginBottom: "10px",
+    fontSize: "0.85rem",
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: "0.03em"
   };
 
   return (
     <div style={{
       minHeight: "100vh",
-      padding: "100px 1.5rem 80px",
-      background: "linear-gradient(135deg, #0a0a0f 0%, #0f0f1e 100%)",
+      padding: "120px 1.5rem 80px",
+      background: "#fafafa",
     }}>
       <div style={{
-        maxWidth: "640px", margin: "0 auto",
-        background: "rgba(13,13,20,0.85)",
-        border: "1px solid #1e1e2e",
-        borderRadius: "24px",
-        padding: "48px 40px",
-        boxShadow: "0 40px 80px rgba(0,0,0,0.6)",
-        backdropFilter: "blur(20px)",
+        maxWidth: "960px",
+        margin: "0 auto",
       }}>
-
-        {/* Header */}
-        <div style={{ marginBottom: "36px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
-            <div style={{
-              width: "36px", height: "36px", borderRadius: "10px",
-              background: "linear-gradient(135deg, #1dbf73, #0a9d5a)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "18px",
-            }}>🚀</div>
-            <h1 style={{ fontSize: "1.75rem", fontWeight: "800", color: "#e8e8f0", margin: 0 }}>
-              Create a Gig
-            </h1>
-          </div>
-          <p style={{ color: "#6b6b8a", fontSize: "0.9rem", margin: 0 }}>
-            Fill in the details below and publish your service to the marketplace.
+        
+        {/* Header Section */}
+        <div style={{ marginBottom: "32px", paddingLeft: "8px" }}>
+          <h1 style={{ fontSize: "2rem", fontWeight: "700", color: "#1e293b", margin: "0 0 8px 0" }}>
+            Create a new Gig
+          </h1>
+          <p style={{ color: "#64748b", fontSize: "1rem", margin: 0 }}>
+            Enter the details below to reach thousands of potential buyers.
           </p>
         </div>
 
-        {/* Success banner */}
-        {success && (
-          <div style={{
-            background: "rgba(29,191,115,0.1)", border: "1px solid rgba(29,191,115,0.3)",
-            color: "#1dbf73", padding: "14px 16px", borderRadius: "10px",
-            marginBottom: "24px", fontWeight: "600", fontSize: "0.9rem",
-            display: "flex", alignItems: "center", gap: "8px",
-          }}>
-            ✅ Gig published! Redirecting to marketplace…
-          </div>
-        )}
+        {/* Form Card */}
+        <div style={{
+          background: "#fff",
+          border: "1px solid #e2e8f0",
+          borderRadius: "8px",
+          padding: "48px",
+          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.08)",
+        }}>
+          
+          {success && (
+            <div style={{ background: "#f0fdf4", border: "1px solid #dcfce7", color: "#15803d", padding: "14px 16px", borderRadius: "6px", marginBottom: "32px", fontWeight: "600", fontSize: "0.9rem" }}>
+              ✅ Gig published! Redirecting to marketplace…
+            </div>
+          )}
 
-        {/* Error banner */}
-        {error && (
-          <div style={{
-            background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)",
-            color: "#f87171", padding: "14px 16px", borderRadius: "10px",
-            marginBottom: "24px", fontSize: "0.9rem",
-            display: "flex", alignItems: "center", gap: "8px",
-          }}>
-            ⚠️ {error}
-          </div>
-        )}
+          {error && (
+            <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#b91c1c", padding: "14px 16px", borderRadius: "6px", marginBottom: "32px", fontSize: "0.9rem" }}>
+              ⚠️ {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "36px" }}>
 
-          {/* Title */}
-          <div>
-            <label style={{ display: "block", color: "#9090b0", marginBottom: "8px", fontSize: "0.85rem", fontWeight: "600", letterSpacing: "0.03em" }}>
-              GIG TITLE *
-            </label>
-            <input
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              placeholder="I will design a professional logo for your brand…"
-              style={input}
-              onFocus={e => e.target.style.borderColor = "#1dbf73"}
-              onBlur={e => e.target.style.borderColor = "#1e1e2e"}
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label style={{ display: "block", color: "#9090b0", marginBottom: "8px", fontSize: "0.85rem", fontWeight: "600", letterSpacing: "0.03em" }}>
-              DESCRIPTION *
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              placeholder="Describe what you offer, your process, and what the buyer will receive…"
-              style={{ ...input, minHeight: "130px", resize: "vertical", lineHeight: "1.6" }}
-              onFocus={e => e.target.style.borderColor = "#1dbf73"}
-              onBlur={e => e.target.style.borderColor = "#1e1e2e"}
-            />
-          </div>
-
-          {/* Price + Category */}
-          <div style={{ display: "flex", gap: "16px" }}>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: "block", color: "#9090b0", marginBottom: "8px", fontSize: "0.85rem", fontWeight: "600", letterSpacing: "0.03em" }}>
-                PRICE (USD) *
-              </label>
-              <div style={{ position: "relative" }}>
-                <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#6b6b8a", fontSize: "1rem", fontWeight: "700", pointerEvents: "none" }}>$</span>
+            {/* Row 1: Title & Category */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
+              <div>
+                <label style={labelStyle}>Gig Title</label>
                 <input
-                  name="price"
-                  type="number"
-                  min="5"
-                  value={formData.price}
+                  name="title"
+                  value={formData.title}
                   onChange={handleChange}
                   required
-                  placeholder="50"
-                  style={{ ...input, paddingLeft: "30px" }}
-                  onFocus={e => e.target.style.borderColor = "#1dbf73"}
-                  onBlur={e => e.target.style.borderColor = "#1e1e2e"}
+                  placeholder="e.g. I will do something I'm really good at"
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = "#10b981"}
+                  onBlur={e => e.target.style.borderColor = "#94a3b8"}
                 />
               </div>
-            </div>
-            <div style={{ flex: 1 }}>
-              <label style={{ display: "block", color: "#9090b0", marginBottom: "8px", fontSize: "0.85rem", fontWeight: "600", letterSpacing: "0.03em" }}>
-                CATEGORY *
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                style={{ ...input, cursor: "pointer" }}
-                onFocus={e => e.target.style.borderColor = "#1dbf73"}
-                onBlur={e => e.target.style.borderColor = "#1e1e2e"}
-              >
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat} style={{ background: "#0d0d14" }}>
-                    {CAT_ICONS[cat]} {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Image Upload */}
-          <div>
-            <label style={{ display: "block", color: "#9090b0", marginBottom: "8px", fontSize: "0.85rem", fontWeight: "600", letterSpacing: "0.03em" }}>
-              GIG IMAGE <span style={{ color: "#4a4a6a", fontWeight: "400" }}>(optional · max 5 MB)</span>
-            </label>
-
-            {/* Hidden real file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-              id="gig-image-upload"
-            />
-
-            {preview ? (
-              /* ── Preview card ── */
-              <div style={{ position: "relative", borderRadius: "12px", overflow: "hidden", border: "1px solid #1e1e2e", height: "180px" }}>
-                <img
-                  src={preview}
-                  alt="Gig preview"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-                {/* Overlay actions */}
-                <div style={{
-                  position: "absolute", inset: 0,
-                  background: "rgba(0,0,0,0.45)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  gap: "12px",
-                  opacity: 0,
-                  transition: "opacity 0.2s",
-                }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = 1}
-                  onMouseLeave={e => e.currentTarget.style.opacity = 0}
+              <div>
+                <label style={labelStyle}>Select a Category</label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  style={{ ...inputStyle, cursor: "pointer", appearance: "none" }}
+                  onFocus={e => e.target.style.borderColor = "#10b981"}
+                  onBlur={e => e.target.style.borderColor = "#94a3b8"}
                 >
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    style={{
-                      padding: "8px 18px", borderRadius: "8px",
-                      background: "rgba(255,255,255,0.15)", backdropFilter: "blur(8px)",
-                      border: "1px solid rgba(255,255,255,0.25)", color: "#fff",
-                      fontWeight: "600", fontSize: "0.85rem", cursor: "pointer",
-                    }}
-                  >
-                    🔄 Change
-                  </button>
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    style={{
-                      padding: "8px 18px", borderRadius: "8px",
-                      background: "rgba(239,68,68,0.2)", backdropFilter: "blur(8px)",
-                      border: "1px solid rgba(239,68,68,0.4)", color: "#f87171",
-                      fontWeight: "600", fontSize: "0.85rem", cursor: "pointer",
-                    }}
-                  >
-                    🗑 Remove
-                  </button>
+                  {CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Row 2: Description */}
+            <div>
+              <label style={labelStyle}>Gig Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                placeholder="Write a clear and detailed description of your gig"
+                style={{ ...inputStyle, minHeight: "180px", resize: "vertical", lineHeight: "1.6" }}
+                onFocus={e => e.target.style.borderColor = "#10b981"}
+                onBlur={e => e.target.style.borderColor = "#94a3b8"}
+              />
+            </div>
+
+            {/* Row 3: Packages Configuration */}
+            <div>
+              <label style={labelStyle}>Packages & Pricing</label>
+              <div style={{ border: "1px solid #e2e8f0", borderRadius: "8px", overflow: "hidden" }}>
+                {/* Tabs */}
+                <div style={{ display: "flex", borderBottom: "1px solid #e2e8f0", background: "#f8fafc" }}>
+                  {["basic", "standard", "premium"].map((tab) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setActiveTab(tab)}
+                      style={{
+                        flex: 1, padding: "14px", fontWeight: "700", fontSize: "0.95rem",
+                        textTransform: "capitalize", border: "none", cursor: "pointer",
+                        background: activeTab === tab ? "#fff" : "transparent",
+                        color: activeTab === tab ? "#1dbf73" : "#64748b",
+                        borderBottom: activeTab === tab ? "2px solid #1dbf73" : "2px solid transparent",
+                      }}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Tab Content */}
+                <div style={{ padding: "24px", display: "grid", gap: "20px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+                    <div>
+                      <label style={labelStyle}>Price (USD)</label>
+                      <input
+                        type="number"
+                        min="5"
+                        value={formData.packages[activeTab].price}
+                        onChange={(e) => handlePackageChange(activeTab, "price", e.target.value)}
+                        required
+                        placeholder={activeTab === "basic" ? "50" : activeTab === "standard" ? "100" : "150"}
+                        style={inputStyle}
+                      />
+                    </div>
+                    <div>
+                      <label style={labelStyle}>Revisions</label>
+                      <input
+                        type="text"
+                        value={formData.packages[activeTab].revisions}
+                        onChange={(e) => handlePackageChange(activeTab, "revisions", e.target.value)}
+                        required
+                        placeholder="e.g. 1, 3, or Unlimited"
+                        style={inputStyle}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Delivery Time</label>
+                    <input
+                      type="text"
+                      value={formData.packages[activeTab].deliveryTime}
+                      onChange={(e) => handlePackageChange(activeTab, "deliveryTime", e.target.value)}
+                      required
+                      placeholder="e.g. 1 day"
+                      style={inputStyle}
+                    />
+                  </div>
+
+                  <div>
+                    <label style={labelStyle}>Deliverables (One per line)</label>
+                    <textarea
+                      value={formData.packages[activeTab].deliverables}
+                      onChange={(e) => handlePackageChange(activeTab, "deliverables", e.target.value)}
+                      required
+                      placeholder="e.g.&#10;Video editing&#10;Script writing&#10;Voice over"
+                      style={{ ...inputStyle, minHeight: "100px", resize: "vertical" }}
+                    />
+                  </div>
                 </div>
               </div>
-            ) : (
-              /* ── Drop zone ── */
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={handleDrop}
+            </div>
+
+            {/* Row 4: Image Upload */}
+            <div>
+              <label style={labelStyle}>Gig Image Cover</label>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+                id="gig-image-upload"
+              />
+
+              {preview ? (
+                <div style={{ position: "relative", borderRadius: "6px", overflow: "hidden", border: "1px solid #e2e8f0", height: "300px" }}>
+                  <img src={preview} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", bottom: "16px", right: "16px", display: "flex", gap: "8px" }}>
+                    <button type="button" onClick={() => fileInputRef.current?.click()} style={{ padding: "8px 16px", borderRadius: "4px", background: "#fff", border: "1px solid #e2e8f0", fontSize: "0.85rem", fontWeight: "600", cursor: "pointer" }}>Change</button>
+                    <button type="button" onClick={removeImage} style={{ padding: "8px 16px", borderRadius: "4px", background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca", fontSize: "0.85rem", fontWeight: "600", cursor: "pointer" }}>Remove</button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  style={{
+                    border: `2px dashed ${dragOver ? "#10b981" : "#cbd5e1"}`,
+                    borderRadius: "6px",
+                    padding: "40px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    background: dragOver ? "#f0fdf4" : "#f8fafc",
+                    transition: "all 0.2s",
+                    height: "300px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                >
+                  <p style={{ color: "#64748b", fontSize: "1rem", fontWeight: "600", margin: 0 }}>
+                    Click or drag an image here
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Submit */}
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px" }}>
+              <button
+                type="submit"
+                disabled={loading || success}
                 style={{
-                  border: `2px dashed ${dragOver ? "#1dbf73" : "#2a2a3a"}`,
-                  borderRadius: "12px",
-                  padding: "40px 20px",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  background: dragOver ? "rgba(29,191,115,0.05)" : "rgba(255,255,255,0.02)",
-                  transition: "all 0.2s",
+                  padding: "16px 48px",
+                  background: loading || success ? "#10b981" : "#1dbf73",
+                  color: "#fff",
+                  borderRadius: "6px",
+                  fontWeight: "700",
+                  fontSize: "1rem",
+                  border: "none",
+                  cursor: loading || success ? "not-allowed" : "pointer",
+                  transition: "background 0.2s",
+                  opacity: loading || success ? 0.8 : 1,
                 }}
+                onMouseEnter={e => { if (!loading && !success) e.currentTarget.style.background = "#059669"; }}
+                onMouseLeave={e => { if (!loading && !success) e.currentTarget.style.background = "#1dbf73"; }}
               >
-                <div style={{ fontSize: "2.5rem", marginBottom: "10px" }}>🖼️</div>
-                <p style={{ color: dragOver ? "#1dbf73" : "#9090b0", fontWeight: "600", margin: "0 0 4px", fontSize: "0.95rem" }}>
-                  {dragOver ? "Drop it here!" : "Click to upload or drag & drop"}
-                </p>
-                <p style={{ color: "#4a4a6a", fontSize: "0.8rem", margin: 0 }}>
-                  JPG, PNG, GIF, WebP · up to 5 MB
-                </p>
-              </div>
-            )}
-          </div>
+                {loading ? "Publishing…" : success ? "Published" : "Create Gig"}
+              </button>
+            </div>
 
-          {/* Divider */}
-          <div style={{ borderTop: "1px solid #1e1e2e", marginTop: "4px" }} />
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading || success}
-            style={{
-              width: "100%", padding: "16px",
-              background: loading || success
-                ? "rgba(29,191,115,0.4)"
-                : "linear-gradient(135deg, #1dbf73, #0a9d5a)",
-              color: "#fff", borderRadius: "12px",
-              fontWeight: "700", fontSize: "1rem",
-              border: "none",
-              cursor: loading || success ? "not-allowed" : "pointer",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              boxShadow: "0 8px 24px rgba(29,191,115,0.3)",
-            }}
-            onMouseEnter={e => { if (!loading && !success) e.currentTarget.style.transform = "translateY(-1px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
-          >
-            {loading ? "Publishing…" : success ? "✅ Published!" : "🚀 Publish Gig"}
-          </button>
-
-          <p style={{ textAlign: "center", color: "#4a4a6a", fontSize: "0.8rem", marginTop: "-8px" }}>
-            Your gig will be live instantly on the marketplace.
-          </p>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

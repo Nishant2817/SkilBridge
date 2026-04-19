@@ -17,13 +17,14 @@ const CATEGORY_ICONS = {
 
 export default function GigDetail() {
   const { id } = useParams();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, openAuthModal } = useAuth();
   const navigate = useNavigate();
 
   const [gig, setGig] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [orderLoading, setOrderLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [activeTab, setActiveTab] = useState("Basic");
 
   useEffect(() => {
     (async () => {
@@ -39,221 +40,199 @@ export default function GigDetail() {
   }, [id]);
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0a0a0f" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{
-          width: "48px", height: "48px", borderRadius: "50%",
-          border: "3px solid #1e1e2e", borderTop: "3px solid #1dbf73",
-          animation: "spin 0.8s linear infinite", margin: "0 auto 16px",
-        }} />
-        <p style={{ color: "#6b6b8a" }}>Loading gig…</p>
-      </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-gray-200 border-t-black rounded-full animate-spin"></div>
     </div>
   );
 
-  if (error) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#0a0a0f" }}>
-      <div style={{ textAlign: "center", color: "#f87171" }}>
-        <div style={{ fontSize: "3rem", marginBottom: "16px" }}>😕</div>
-        <h2 style={{ marginBottom: "8px" }}>{error}</h2>
-        <Link to="/" style={{ color: "#1dbf73" }}>← Back to home</Link>
+  if (error || !gig) return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-center text-red-500">
+        <div className="text-5xl mb-4">😕</div>
+        <h2 className="mb-2 font-bold">{error || "Gig not found"}</h2>
+        <Link to="/" className="text-blue-600 hover:underline">← Back to home</Link>
       </div>
     </div>
   );
 
-  const categoryIcon = CATEGORY_ICONS[gig.category] || "🔧";
   const joinedYear = gig.user?.createdAt
     ? new Date(gig.user.createdAt).getFullYear()
-    : "N/A";
+    : "2024";
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #0a0a0f 0%, #0f0f1e 100%)",
-      padding: "100px 1.5rem 60px",
-    }}>
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+    <div className="min-h-screen bg-white pt-28 pb-20 px-6">
+      <div className="max-w-[1150px] mx-auto">
 
-        {/* Breadcrumb */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "28px" }}>
-          <Link to="/" style={{ color: "#6b6b8a", fontSize: "0.875rem", textDecoration: "none" }}
-            onMouseEnter={e => e.currentTarget.style.color = "#1dbf73"}
-            onMouseLeave={e => e.currentTarget.style.color = "#6b6b8a"}
-          >
-            Home
-          </Link>
-          <span style={{ color: "#3a3a5a" }}>›</span>
-          <span style={{ color: "#6b6b8a", fontSize: "0.875rem" }}>{gig.category}</span>
-          <span style={{ color: "#3a3a5a" }}>›</span>
-          <span style={{ color: "#c0c0d8", fontSize: "0.875rem" }}>{gig.title}</span>
+        {/* Top Navbar Context */}
+        <div className="flex justify-between items-center mb-8">
+          <div className="flex items-center gap-2 text-[0.85rem] font-medium text-gray-500">
+            <Link to="/" className="hover:text-black">🏠</Link>
+            <span>/</span>
+            <span className="hover:text-black cursor-pointer">{gig.category}</span>
+            <span>/</span>
+            <span className="text-gray-900 line-clamp-1">{gig.title}</span>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <button className="flex items-center gap-2 text-gray-500 hover:text-black font-semibold text-sm border border-transparent hover:bg-gray-50 px-3 py-1.5 rounded-md transition-colors">
+              <span>☰</span> <span className="text-red-500">❤</span> 253
+            </button>
+            <button className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black border border-gray-200 rounded-md hover:bg-gray-50 transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+            </button>
+            <button className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black border border-gray-200 rounded-md hover:bg-gray-50 transition-colors font-bold">
+              ...
+            </button>
+          </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "32px", alignItems: "start" }}>
-
-          {/* LEFT — Gig content */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-12 items-start">
+          
+          {/* LEFT COLUMN */}
           <div>
-            {/* Category badge */}
-            <div style={{ marginBottom: "16px" }}>
-              <span style={{
-                display: "inline-flex", alignItems: "center", gap: "6px",
-                background: "rgba(29,191,115,0.1)", border: "1px solid rgba(29,191,115,0.25)",
-                borderRadius: "20px", padding: "5px 14px",
-                color: "#1dbf73", fontSize: "0.8rem", fontWeight: "600",
-              }}>
-                {categoryIcon} {gig.category}
-              </span>
-            </div>
-
             {/* Title */}
-            <h1 style={{
-              fontSize: "clamp(1.4rem, 3vw, 2.2rem)",
-              fontWeight: "800", color: "#e8e8f0",
-              letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: "24px",
-            }}>
+            <h1 className="text-[28px] lg:text-[32px] font-bold text-[#222325] leading-[1.3] mb-6">
               {gig.title}
             </h1>
 
-            {/* Seller row */}
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "32px" }}>
-              <div style={{
-                width: "42px", height: "42px", borderRadius: "10px",
-                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "0.9rem", fontWeight: "700", color: "#fff",
-              }}>
-                {gig.user?.username?.slice(0, 2).toUpperCase() || "?"}
+            {/* Seller Info */}
+            <div className="flex items-center gap-4 mb-8 pb-4">
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center object-cover">
+                {gig.user?.profilePic ? (
+                   <img src={gig.user.profilePic} alt={gig.user.username} className="w-full h-full object-cover"/>
+                ) : (
+                   <span className="text-lg font-bold text-gray-600">{gig.user?.username?.slice(0,2).toUpperCase()}</span>
+                )}
               </div>
-              <div>
-                <div style={{ fontWeight: "700", color: "#c0c0d8", fontSize: "0.95rem" }}>
-                  {gig.user?.username || "Unknown"}
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-[#222325]">{gig.user?.username || "Unknown"}</span>
+                  <span className="text-gray-400 font-bold text-sm">Level 2</span>
+                  <span className="text-gray-400 text-sm">|</span>
+                  <span className="text-gray-500 text-sm">5 orders in queue</span>
                 </div>
-                <div style={{ color: "#6b6b8a", fontSize: "0.78rem" }}>Member since {joinedYear}</div>
+                <div className="flex items-center gap-1 text-sm text-[#222325] mt-1">
+                  <span className="text-black font-bold tracking-tighter">★★★★★</span>
+                  <span className="font-bold">4.8</span>
+                  <span className="text-gray-400 underline ml-1 cursor-pointer hover:text-black">(144 reviews)</span>
+                </div>
               </div>
             </div>
 
-            {/* Gig image / placeholder */}
-            <div style={{
-              width: "100%", aspectRatio: "16/9",
-              borderRadius: "20px", overflow: "hidden",
-              background: "linear-gradient(135deg, #1a1a2e, #16213e)",
-              border: "1px solid #1e1e2e",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "5rem", marginBottom: "32px",
-            }}>
-              {gig.image
-                ? <img src={gig.image} alt={gig.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                : <span>{categoryIcon}</span>
-              }
+            {/* Main Media Carousel Mock */}
+            <div className="w-full aspect-[16/9] bg-gray-100 mb-8 border border-gray-200 rounded-lg overflow-hidden relative group">
+              {gig.image ? (
+                <img src={gig.image} alt={gig.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[4rem]">
+                  {CATEGORY_ICONS[gig.category] || "🔧"}
+                </div>
+              )}
+              {/* Carousel Arrows */}
+              <button className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+              </button>
+              <button className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white shadow-md rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
             </div>
 
-            {/* Description */}
-            <div style={{
-              background: "rgba(19,19,26,0.7)", border: "1px solid #1e1e2e",
-              borderRadius: "18px", padding: "28px",
-            }}>
-              <h2 style={{ fontSize: "1.1rem", fontWeight: "700", color: "#e8e8f0", marginBottom: "14px" }}>
-                About this gig
-              </h2>
-              <p style={{ color: "#9090b0", lineHeight: 1.75, fontSize: "0.95rem", whiteSpace: "pre-wrap" }}>
-                {gig.description}
-              </p>
+            <div className="text-[#404145] text-base leading-relaxed">
+              <h2 className="text-[#222325] font-bold text-xl mb-4">About this gig</h2>
+              <p className="whitespace-pre-wrap">{gig.description}</p>
             </div>
+            
           </div>
 
-          {/* RIGHT — Sticky order card */}
-          <div style={{ position: "sticky", top: "90px" }}>
-            <div style={{
-              background: "rgba(19,19,26,0.9)", border: "1px solid #1e1e2e",
-              borderRadius: "20px", padding: "28px",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
-              backdropFilter: "blur(20px)",
-            }}>
-              {/* Price */}
-              <div style={{ marginBottom: "20px" }}>
-                <div style={{ color: "#6b6b8a", fontSize: "0.8rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "6px" }}>
-                  Starting at
-                </div>
-                <div style={{
-                  fontSize: "2.2rem", fontWeight: "900",
-                  background: "linear-gradient(135deg, #1dbf73, #0a9d5a)",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                }}>
-                  ${Number(gig.price).toFixed(2)}
-                </div>
-              </div>
-
-              <div style={{ borderTop: "1px solid #1e1e2e", padding: "16px 0", marginBottom: "4px" }}>
-                {[
-                  { icon: "⚡", label: "Fast Delivery" },
-                  { icon: "🔁", label: "2 Revisions" },
-                  { icon: "✅", label: "Money-back Guarantee" },
-                ].map(item => (
-                  <div key={item.label} style={{
-                    display: "flex", alignItems: "center", gap: "10px",
-                    color: "#9090b0", fontSize: "0.875rem", marginBottom: "10px",
-                  }}>
-                    <span>{item.icon}</span> {item.label}
-                  </div>
+          {/* RIGHT COLUMN (Sticky Card) */}
+          <div className="sticky top-24">
+            
+            {/* Tabbed Card Layout */}
+            <div className="border border-[#dadbdd] bg-white rounded-md flex flex-col">
+              
+              {/* Tabs */}
+              <div className="flex border-b border-[#dadbdd]">
+                {["Basic", "Standard", "Premium"].map(tab => (
+                  <button 
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 text-center py-4 font-bold text-[15px] border-b-2 transition-colors ${
+                      activeTab === tab ? "border-[#222325] text-[#222325]" : "border-transparent text-[#74767e] hover:text-[#222325]"
+                    }`}
+                  >
+                    {tab}
+                  </button>
                 ))}
               </div>
 
-              {/* CTA */}
-              <button
-                id="gig-order-now"
-                disabled={orderLoading}
-                onClick={async () => {
-                  if (!isAuthenticated) { navigate("/login"); return; }
-                  try {
-                    setOrderLoading(true);
-                    await createOrder(gig.id, user?.token);
-                    navigate("/orders");
-                  } catch (err) {
-                    alert(err.message);
-                  } finally {
-                    setOrderLoading(false);
-                  }
-                }}
-                style={{
-                  width: "100%", padding: "15px",
-                  background: "linear-gradient(135deg, #1dbf73, #0a9d5a)",
-                  color: "#fff", borderRadius: "12px",
-                  fontWeight: "700", fontSize: "1rem", border: "none",
-                  cursor: orderLoading ? "not-allowed" : "pointer",
-                  boxShadow: "0 6px 25px rgba(29,191,115,0.4)",
-                  transition: "transform 0.2s, box-shadow 0.2s", marginBottom: "12px",
-                  opacity: orderLoading ? 0.7 : 1
-                }}
-                onMouseEnter={e => { if (!orderLoading) e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 10px 35px rgba(29,191,115,0.55)"; }}
-                onMouseLeave={e => { if (!orderLoading) e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 6px 25px rgba(29,191,115,0.4)"; }}
-              >
-                {orderLoading ? "Processing..." : (isAuthenticated ? "Order Now" : "Sign in to Order")}
-              </button>
+              {/* Tab Content */}
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-6">
+                  <span className="font-bold text-[#222325] text-base uppercase tracking-wide">
+                    {activeTab}
+                  </span>
+                  <span className="text-[#222325] text-[1.4rem] font-bold">
+                    ${gig.packages && gig.packages[activeTab.toLowerCase()] 
+                      ? Number(gig.packages[activeTab.toLowerCase()].price).toFixed(2) 
+                      : activeTab === "Standard" ? (Number(gig.price) * 1.5).toFixed(2) : activeTab === "Premium" ? (Number(gig.price) * 2).toFixed(2) : Number(gig.price).toFixed(2)}
+                  </span>
+                </div>
 
-              <button
+                <p className="text-[#62646a] text-sm leading-relaxed mb-6">
+                  {gig.description.substring(0, 100)}...<br/><br/>
+                  Quality output + High Priority support included.
+                </p>
+
+                <div className="flex gap-4 items-center text-[#222325] font-bold text-[13px] mb-4">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-gray-500">🕐</span> {gig.packages && gig.packages[activeTab.toLowerCase()] ? gig.packages[activeTab.toLowerCase()].deliveryTime : "1-day"} delivery
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-gray-500">🔁</span> {gig.packages && gig.packages[activeTab.toLowerCase()] ? gig.packages[activeTab.toLowerCase()].revisions : "Unlimited"} Revisions
+                  </div>
+                </div>
+
+                {/* Features list */}
+                <div className="space-y-2 mb-8">
+                  {(gig.packages && gig.packages[activeTab.toLowerCase()]?.deliverables 
+                    ? gig.packages[activeTab.toLowerCase()].deliverables.split('\n').filter(f => f.trim()) 
+                    : ["Video editing", "Script writing", "30 seconds running time", "Product imagery", "Voice over recording"]
+                  ).map((feature, i) => (
+                    <div key={i} className="flex items-center gap-3 text-[#62646a] text-[14px]">
+                       <span className="text-[#1dbf73] font-black">✓</span> 
+                       {feature}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Continue CTA */}
+                <button
+                  onClick={() => {
+                    if (!isAuthenticated) { openAuthModal("login"); return; }
+                    navigate(`/checkout/${gig.id}`);
+                  }}
+                  className="w-full bg-[#1dbf73] hover:bg-[#19a463] text-white font-bold py-3.5 rounded text-[15px] flex items-center justify-center gap-2 transition-colors focus:ring-4 ring-[#1dbf73]/20 outline-none"
+                >
+                  Continue <span>→</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Contact Seller CTA below the card */}
+            <div className="mt-4">
+              <button 
                 onClick={() => {
-                  if (!isAuthenticated) { navigate("/login"); return; }
+                  if (!isAuthenticated) { openAuthModal("login"); return; }
                   navigate(`/chat/${gig.user?.id}`);
                 }}
-                style={{
-                  width: "100%", padding: "13px",
-                  background: "transparent", border: "1px solid #2a2a3a",
-                  color: "#c0c0d8", borderRadius: "12px",
-                  fontWeight: "600", fontSize: "0.95rem",
-                  cursor: "pointer", transition: "all 0.2s",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "#1dbf73"; e.currentTarget.style.color = "#1dbf73"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#2a2a3a"; e.currentTarget.style.color = "#c0c0d8"; }}
-              >
-                💬 Message Seller
+                className="w-full bg-white border border-[#222325] hover:bg-[#222325] hover:text-white text-[#222325] font-bold py-3.5 rounded text-[15px] transition-colors"
+               >
+                Contact me
               </button>
-
-              {/* Posted date */}
-              <p style={{ textAlign: "center", color: "#4a4a6a", fontSize: "0.75rem", marginTop: "16px" }}>
-                Posted {new Date(gig.createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-              </p>
             </div>
+
           </div>
+
         </div>
       </div>
     </div>

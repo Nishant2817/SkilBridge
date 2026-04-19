@@ -1,4 +1,4 @@
-const BASE = "http://localhost:5000/api/users";
+const BASE = "/api/users";
 
 /**
  * PUT /api/users/become-seller

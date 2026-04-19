@@ -28,6 +28,7 @@ model Gig {
   image       String
   userId      Int
   createdAt   DateTime @default(now())
+  packages    Json?
 
   user   User    @relation(fields: [userId], references: [id])
   orders Order[]

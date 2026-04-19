@@ -1,7 +1,8 @@
 import axios from "axios";
 
+// Use relative URL so Vite dev proxy handles it → no CORS errors
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/gigs",
+  baseURL: "/api/gigs",
 });
 
 /**
@@ -10,7 +11,8 @@ const api = axios.create({
 export async function getAllGigs(filters = {}) {
   try {
     const { data } = await api.get("/", { params: filters });
-    return data;
+    // Backend may return array directly or { gigs: [] }
+    return Array.isArray(data) ? data : (data.gigs ?? []);
   } catch (error) {
     throw new Error(error.response?.data?.error || "Failed to fetch gigs");
   }

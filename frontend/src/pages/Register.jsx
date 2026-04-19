@@ -3,8 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../api/auth";
 
 const roles = [
-  { id: "buyer",  label: "Buyer",      desc: "I want to hire freelancers", emoji: "🛒" },
-  { id: "seller", label: "Freelancer", desc: "I want to offer services",  emoji: "💼" },
+  { id: "buyer", label: "Buyer", desc: "I want to hire freelancers", emoji: "🛒" },
+  { id: "seller", label: "Freelancer", desc: "I want to offer services", emoji: "💼" },
 ];
 
 const inputStyle = {
@@ -22,11 +22,11 @@ const inputStyle = {
 };
 
 export default function Register() {
-  const [form,        setForm]        = useState({ name: "", email: "", password: "", role: "buyer" });
-  const [showPassword,setShowPassword]= useState(false);
-  const [error,       setError]       = useState("");
-  const [success,     setSuccess]     = useState("");
-  const [loading,     setLoading]     = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "buyer" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -168,7 +168,7 @@ export default function Register() {
                 required
                 style={inputStyle}
                 onFocus={e => e.target.style.borderColor = "#1dbf73"}
-                onBlur={e  => e.target.style.borderColor = "#2a2a3a"}
+                onBlur={e => e.target.style.borderColor = "#2a2a3a"}
               />
             </div>
 
@@ -185,7 +185,7 @@ export default function Register() {
                 required
                 style={inputStyle}
                 onFocus={e => e.target.style.borderColor = "#1dbf73"}
-                onBlur={e  => e.target.style.borderColor = "#2a2a3a"}
+                onBlur={e => e.target.style.borderColor = "#2a2a3a"}
               />
             </div>
 
@@ -204,7 +204,7 @@ export default function Register() {
                   minLength={8}
                   style={{ ...inputStyle, padding: "13px 48px 13px 16px" }}
                   onFocus={e => e.target.style.borderColor = "#1dbf73"}
-                  onBlur={e  => e.target.style.borderColor = "#2a2a3a"}
+                  onBlur={e => e.target.style.borderColor = "#2a2a3a"}
                 />
                 <button
                   type="button"

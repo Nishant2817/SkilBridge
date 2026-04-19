@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/admin",
+  baseURL: "/api/admin",
 });
 
 const getConfig = (token) => ({ headers: { Authorization: `Bearer ${token}` } });

@@ -80,6 +80,17 @@ export function AuthProvider({ children }) {
     });
   }, []);
 
+  // ─── Modal State ─────────────────────────────────────────────────────────
+  const [authModalType, setAuthModalType] = useState(null); // "login" | "register" | null
+
+  const openAuthModal = useCallback((type = "login") => {
+    setAuthModalType(type);
+  }, []);
+
+  const closeAuthModal = useCallback(() => {
+    setAuthModalType(null);
+  }, []);
+
   const isSeller = user?.isSeller === true;
   const isAdmin = user?.role === "admin";
 
@@ -97,6 +108,9 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!token,
         isSeller,
         isAdmin,
+        authModalType,
+        openAuthModal,
+        closeAuthModal,
       }}
     >
       {children}

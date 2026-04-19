@@ -1,208 +1,202 @@
 import { useNavigate } from "react-router-dom";
-import { useRef, useState } from "react";
+
+// SVG Illustrations for each category (inline, line-art style)
+const CategoryIllustration = ({ type }) => {
+  const illustrations = {
+    "Design": (
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 90, height: 90 }}>
+        <rect x="15" y="30" width="55" height="60" rx="4" stroke="#222" strokeWidth="2.5" fill="none"/>
+        <line x1="25" y1="45" x2="60" y2="45" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="25" y1="55" x2="50" y2="55" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="87" cy="50" r="18" stroke="#1dbf73" strokeWidth="2.5" fill="none"/>
+        <path d="M80 50 L87 43 L94 50 L87 57 Z" stroke="#1dbf73" strokeWidth="2" fill="none"/>
+        <circle cx="87" cy="50" r="4" fill="#1dbf73" opacity="0.6"/>
+        <line x1="75" y1="55" x2="68" y2="62" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
+        <circle cx="66" cy="64" r="3" stroke="#222" strokeWidth="2" fill="none"/>
+      </svg>
+    ),
+    "Development": (
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 90, height: 90 }}>
+        <rect x="10" y="35" width="75" height="55" rx="6" stroke="#222" strokeWidth="2.5" fill="none"/>
+        <rect x="10" y="35" width="75" height="12" rx="6" stroke="#222" strokeWidth="2.5" fill="#f5f5f5"/>
+        <circle cx="20" cy="41" r="3" fill="#ff5f57"/>
+        <circle cx="30" cy="41" r="3" fill="#febc2e"/>
+        <circle cx="40" cy="41" r="3" fill="#28c840"/>
+        <path d="M25 58 L18 65 L25 72" stroke="#1dbf73" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M35 58 L42 65 L35 72" stroke="#1dbf73" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <line x1="28" y1="72" x2="32" y2="58" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="95" cy="55" r="12" stroke="#222" strokeWidth="2" fill="none"/>
+        <line x1="88" y1="62" x2="83" y2="67" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
+      </svg>
+    ),
+    "Marketing": (
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 90, height: 90 }}>
+        <rect x="8" y="40" width="50" height="40" rx="5" stroke="#222" strokeWidth="2.5" fill="none"/>
+        <path d="M18 60 L25 52 L33 63 L40 48 L50 60" stroke="#1dbf73" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <path d="M75 30 L90 25 L85 55 L70 55 Z" stroke="#222" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+        <line x1="80" y1="55" x2="75" y2="70" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
+        <line x1="85" y1="55" x2="80" y2="70" stroke="#222" strokeWidth="2.5" strokeLinecap="round"/>
+        <ellipse cx="68" cy="40" rx="4" ry="10" stroke="#1dbf73" strokeWidth="2" fill="none"/>
+        <circle cx="88" cy="20" r="5" stroke="#222" strokeWidth="2" fill="none"/>
+        <line x1="93" y1="15" x2="100" y2="10" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="93" y1="20" x2="100" y2="20" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="93" y1="25" x2="100" y2="30" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
+    "Writing": (
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 90, height: 90 }}>
+        <rect x="10" y="45" width="55" height="55" rx="4" stroke="#222" strokeWidth="2.5" fill="none"/>
+        <rect x="22" y="30" width="55" height="55" rx="4" stroke="#222" strokeWidth="2.5" fill="white"/>
+        <line x1="32" y1="48" x2="67" y2="48" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="32" y1="58" x2="67" y2="58" stroke="#1dbf73" strokeWidth="2" strokeLinecap="round"/>
+        <line x1="32" y1="68" x2="55" y2="68" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+        <path d="M72 25 L80 33 L60 53 L52 45 Z" stroke="#222" strokeWidth="2" strokeLinejoin="round" fill="none"/>
+        <line x1="52" y1="53" x2="52" y2="45" stroke="#222" strokeWidth="2"/>
+        <line x1="68" y1="30" x2="77" y2="39" stroke="#222" strokeWidth="2"/>
+      </svg>
+    ),
+    "Video": (
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 90, height: 90 }}>
+        <rect x="20" y="35" width="55" height="45" rx="5" stroke="#222" strokeWidth="2.5" fill="none"/>
+        <polygon points="75,45 95,35 95,80 75,70" stroke="#222" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+        <circle cx="47" cy="57" r="10" stroke="#1dbf73" strokeWidth="2.5" fill="none"/>
+        <polygon points="44,52 44,62 52,57" fill="#1dbf73"/>
+      </svg>
+    ),
+    "Music": (
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 90, height: 90 }}>
+        <path d="M40 85 A12 12 0 1 1 50 75 L50 30 L85 20 L85 65 A12 12 0 1 1 95 55 L95 10 L50 20" stroke="#222" strokeWidth="2.5" fill="none" strokeLinejoin="round"/>
+        <circle cx="38" cy="85" r="8" fill="#1dbf73"/>
+        <circle cx="73" cy="65" r="8" fill="#1dbf73"/>
+      </svg>
+    ),
+    "Business": (
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 90, height: 90 }}>
+        <rect x="20" y="30" width="55" height="50" rx="4" stroke="#222" strokeWidth="2.5" fill="none"/>
+        <line x1="20" y1="43" x2="75" y2="43" stroke="#222" strokeWidth="2"/>
+        <circle cx="32" cy="36" r="4" stroke="#222" strokeWidth="2" fill="none"/>
+        <circle cx="50" cy="60" r="12" stroke="#1dbf73" strokeWidth="2.5" fill="none"/>
+        <polyline points="44,60 49,65 58,55" stroke="#1dbf73" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <circle cx="90" cy="45" r="14" stroke="#222" strokeWidth="2" fill="none"/>
+        <ellipse cx="90" cy="41" rx="5" ry="5" stroke="#222" strokeWidth="2" fill="none"/>
+        <path d="M82 56 Q90 52 98 56" stroke="#222" strokeWidth="2" strokeLinecap="round" fill="none"/>
+        <line x1="90" y1="59" x2="90" y2="70" stroke="#222" strokeWidth="2"/>
+        <line x1="84" y1="65" x2="96" y2="65" stroke="#222" strokeWidth="2"/>
+      </svg>
+    ),
+    "Data": (
+      <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: 90, height: 90 }}>
+        <rect x="20" y="25" width="60" height="50" rx="4" stroke="#222" strokeWidth="2.5" fill="none"/>
+        <line x1="20" y1="38" x2="80" y2="38" stroke="#222" strokeWidth="2"/>
+        <path d="M35 55 L45 50 L55 60 L70 45" stroke="#1dbf73" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        <circle cx="45" cy="50" r="3" fill="#1dbf73"/>
+        <circle cx="55" cy="60" r="3" fill="#1dbf73"/>
+        <circle cx="35" cy="55" r="3" fill="#1dbf73"/>
+        <circle cx="70" cy="45" r="3" fill="#1dbf73"/>
+        <rect x="30" y="80" width="40" height="5" rx="2.5" stroke="#222" strokeWidth="2" fill="none"/>
+        <line x1="50" y1="75" x2="50" y2="80" stroke="#222" strokeWidth="2"/>
+        <circle cx="95" cy="40" r="12" stroke="#222" strokeWidth="2" fill="none"/>
+        <ellipse cx="95" cy="37" rx="5" ry="5" stroke="#222" strokeWidth="1.8" fill="none"/>
+        <path d="M88 50 Q95 46 102 50" stroke="#222" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+      </svg>
+    ),
+  };
+
+  return illustrations[type] || null;
+};
 
 const categories = [
-  {
-    id: 1,
-    title: "Design",
-    description: "Logos, branding, UI/UX",
-    count: "2.4k services",
-    accent: "#8b5cf6",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 2,
-    title: "Development",
-    description: "Web, mobile, software",
-    count: "3.1k services",
-    accent: "#3b82f6",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 3,
-    title: "Writing",
-    description: "Copywriting, blogs, editing",
-    count: "1.8k services",
-    accent: "#eab308",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 4,
-    title: "Video",
-    description: "Editing, motion, 3D",
-    count: "1.2k services",
-    accent: "#ec4899",
-    image: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 5,
-    title: "Marketing",
-    description: "SEO, ads, social media",
-    count: "2.0k services",
-    accent: "#f97316",
-    image: "https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 6,
-    title: "Music",
-    description: "Mixing, composing, voiceover",
-    count: "980 services",
-    accent: "#06b6d4",
-    image: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 7,
-    title: "Business",
-    description: "Strategy, consulting, finance",
-    count: "1.5k services",
-    accent: "#10b981",
-    image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
-  },
-  {
-    id: 8,
-    title: "Data & AI",
-    description: "Analysis, ML, automation",
-    count: "870 services",
-    accent: "#6366f1",
-    image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&auto=format&fit=crop&q=80",
-  },
+  { id: 1, name: "Design", query: "Design" },
+  { id: 2, name: "Development", query: "Development" },
+  { id: 3, name: "Marketing", query: "Marketing" },
+  { id: 4, name: "Writing", query: "Writing" },
+  { id: 5, name: "Video", query: "Video" },
+  { id: 6, name: "Music", query: "Music" },
+  { id: 7, name: "Business", query: "Business" },
+  { id: 8, name: "Data", query: "Data" },
 ];
 
 export default function CategoriesSection() {
   const navigate = useNavigate();
-  const scrollRef = useRef(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const handleCategoryClick = (title) => {
-    navigate(`/gigs?category=${encodeURIComponent(title)}`);
-  };
-
-  const updateScrollState = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 4);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
-  };
-
-  const scroll = (direction) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const cardWidth = 288 + 24; // w-72 + gap-6
-    el.scrollBy({ left: direction === "left" ? -cardWidth : cardWidth, behavior: "smooth" });
-    setTimeout(updateScrollState, 350);
+  const handleClick = (query) => {
+    navigate(`/gigs?category=${encodeURIComponent(query)}`);
   };
 
   return (
-    <section className="py-20 bg-slate-900 border-t border-slate-800">
-      <div className="max-w-7xl mx-auto px-6">
-
+    <section style={{ background: "#fff", padding: "80px 2rem" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         {/* Header */}
-        <div className="mb-10 flex items-end justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-white">Explore Our Top Categories</h2>
-            <p className="text-gray-400 mt-2">
-              From creative design to expert development — find the right talent for your project.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="flex gap-2">
-              <button
-                onClick={() => scroll("left")}
-                disabled={!canScrollLeft}
-                aria-label="Scroll left"
-                className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200
-                  ${canScrollLeft
-                    ? "border-slate-600 text-white hover:bg-slate-700"
-                    : "border-slate-800 text-slate-700 cursor-default"}`}
-              >
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <button
-                onClick={() => scroll("right")}
-                disabled={!canScrollRight}
-                aria-label="Scroll right"
-                className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200
-                  ${canScrollRight
-                    ? "border-slate-600 text-white hover:bg-slate-700"
-                    : "border-slate-800 text-slate-700 cursor-default"}`}
-              >
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </div>
-          </div>
+        <div style={{ textAlign: "center", marginBottom: 50 }}>
+          <h2 style={{
+            fontSize: "2.2rem",
+            fontWeight: 800,
+            color: "#1a1a2e",
+            marginBottom: 10,
+            letterSpacing: "-0.5px",
+          }}>
+            Top categories
+          </h2>
+          <p style={{ color: "#6b7280", fontSize: "1rem" }}>
+            Easily find the right service from over 2000+ skills
+          </p>
         </div>
 
-        {/* Scrollable Strip */}
-        <div className="relative">
-          <div
-            ref={scrollRef}
-            onScroll={updateScrollState}
-            className="flex gap-6 overflow-x-auto pb-3"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryClick(cat.title)}
-                className="flex-shrink-0 w-72 bg-white rounded-2xl shadow-md hover:shadow-xl
-                  transition-all duration-300 overflow-hidden hover:-translate-y-1
-                  border border-gray-100 text-left group"
-              >
-                {/* ── Image Section ── */}
-                <div className="relative w-full h-48 overflow-hidden bg-gray-100 flex-shrink-0">
-                  <img
-                    src={cat.image}
-                    alt={cat.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      e.target.src = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&auto=format&fit=crop";
-                    }}
-                  />
-                  {/* Count badge */}
-                  <span
-                    className="absolute top-3 left-3 text-white text-[11px] font-bold px-2.5 py-1 rounded"
-                    style={{ backgroundColor: cat.accent }}
-                  >
-                    {cat.count}
-                  </span>
-                </div>
-
-                {/* ── Details Section ── */}
-                <div className="p-4 flex flex-col gap-1">
-                  <h3
-                    className="text-gray-800 font-bold text-base group-hover:transition-colors"
-                    style={{ "--tw-text-opacity": 1 }}
-                  >
-                    {cat.title}
-                  </h3>
-                  <p className="text-gray-500 text-sm">{cat.description}</p>
-
-                  <span
-                    className="mt-2 text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
-                    style={{ color: cat.accent }}
-                  >
-                    Browse services →
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* Fade edges */}
-          {canScrollLeft && (
-            <div className="pointer-events-none absolute left-0 top-0 bottom-3 w-16 bg-gradient-to-r from-slate-900 to-transparent" />
-          )}
-          {canScrollRight && (
-            <div className="pointer-events-none absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-slate-900 to-transparent" />
-          )}
+        {/* Grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 24,
+        }}>
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => handleClick(cat.query)}
+              style={{
+                background: "#fff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 16,
+                padding: "32px 20px 24px",
+                cursor: "pointer",
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 16,
+                transition: "all 0.25s ease",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                fontFamily: "inherit",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "0 8px 30px rgba(0,0,0,0.12)";
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.borderColor = "#1dbf73";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.borderColor = "#e5e7eb";
+              }}
+            >
+              <div style={{
+                width: 100,
+                height: 100,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+                <CategoryIllustration type={cat.name} />
+              </div>
+              <span style={{
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                color: "#1a1a2e",
+              }}>
+                {cat.name}
+              </span>
+            </button>
+          ))}
         </div>
-
       </div>
     </section>
   );

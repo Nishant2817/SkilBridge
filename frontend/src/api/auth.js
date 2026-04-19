@@ -1,4 +1,4 @@
-const BASE = "http://localhost:5000/api/auth";
+const BASE = "/api/auth";
 
 /**
  * POST /api/auth/login
