@@ -12,9 +12,10 @@ import Orders from "./pages/Orders";
 import Checkout from "./pages/Checkout";
 import MySales from "./pages/MySales";
 import AdminDashboard from "./pages/AdminDashboard";
-import Chat from "./pages/Chat";
+import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import MyGigs from "./pages/MyGigs";
 
 function App() {
   return (
@@ -44,14 +45,13 @@ function App() {
             {/* Admin Hub */}
             <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
 
-            {/* Chat */}
-            <Route path="/chat/:userId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+            {/* Messaging */}
+            <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
 
             {/* Placeholder stubs — will be implemented in later phases */}
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/profile/edit" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
-            <Route path="/my-gigs" element={<ProtectedRoute><PlaceholderPage title="My Gigs" /></ProtectedRoute>} />
-            <Route path="/messages" element={<ProtectedRoute><PlaceholderPage title="Messages" /></ProtectedRoute>} />
+            <Route path="/my-gigs" element={<ProtectedRoute><MyGigs /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><PlaceholderPage title="Analytics" /></ProtectedRoute>} />
           </Routes>
         </main>

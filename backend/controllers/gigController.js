@@ -2,11 +2,12 @@ import prisma from "../config/db.js";
 
 // GET /api/gigs?category=&search=
 export const getAllGigs = async (req, res) => {
-  const { category, search } = req.query;
+  const { category, search, userId } = req.query;
   try {
     const gigs = await prisma.gig.findMany({
       where: {
         ...(category ? { category: { equals: category, mode: "insensitive" } } : {}),
+        ...(userId ? { userId: Number(userId) } : {}),
         ...(search
           ? {
               OR: [

@@ -1,22 +1,31 @@
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
-const stats = [
-  { icon: "💼", label: "Active Gigs",    value: "0",   color: "#3b82f6", bg: "#eff6ff" },
-  { icon: "📦", label: "Orders",         value: "0",   color: "#8b5cf6", bg: "#f5f3ff" },
-  { icon: "⭐", label: "Avg. Rating",    value: "—",   color: "#f59e0b", bg: "#fffbeb" },
-  { icon: "💰", label: "Total Earned",   value: "$0",  color: "#10b981", bg: "#ecfdf5" },
-];
+import { useState, useEffect } from "react";
+import { getAnalytics } from "../api/analytics";
 
 const quickActions = [
-  { icon: "➕", label: "Post a New Gig",    path: "/gigs/new",   color: "#10b981", bg: "#ecfdf5" },
+  { icon: "➕", label: "Post a New Gig",    path: "/add-gig",   color: "#10b981", bg: "#ecfdf5" },
   { icon: "📋", label: "Manage Orders",     path: "/orders",     color: "#6366f1", bg: "#eef2ff" },
   { icon: "💬", label: "Messages",          path: "/messages",   color: "#f59e0b", bg: "#fffbeb" },
-  { icon: "📊", label: "Analytics",         path: "/analytics",  color: "#ec4899", bg: "#fdf2f8" },
 ];
 
 export default function SellerDashboard() {
-  const { user, mode, setMode, isSeller } = useAuth();
+  const { user, mode, setMode, isSeller, token } = useAuth();
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    if (isSeller && mode === "seller") {
+      getAnalytics(token).then(setAnalytics).catch(console.error);
+    }
+  }, [isSeller, mode, token]);
+
+  const stats = [
+    { icon: "💼", label: "Active Gigs",    value: analytics?.totalGigs || "0",   color: "#3b82f6", bg: "#eff6ff" },
+    { icon: "📦", label: "Orders Linked",  value: analytics?.totalOrders || "0",   color: "#8b5cf6", bg: "#f5f3ff" },
+    { icon: "⭐", label: "Completed",      value: analytics?.completedOrders || "0",   color: "#f59e0b", bg: "#fffbeb" },
+    { icon: "💰", label: "Total Earned",   value: `$${analytics?.totalEarnings || 0}`,  color: "#10b981", bg: "#ecfdf5" },
+  ];
 
   // If user is not a seller, show upgrade prompt
   if (!isSeller) {
@@ -261,7 +270,7 @@ export default function SellerDashboard() {
           </div>
         </div>
 
-        {/* ── Recent Gigs placeholder ── */}
+        {/* ── Recent Activity ── */}
         <div style={{
           marginTop: "24px",
           background: "#ffffff", border: "1px solid #e2e8f0",
@@ -270,16 +279,38 @@ export default function SellerDashboard() {
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
             <h2 style={{ fontSize: "1.1rem", fontWeight: "800", color: "#1e293b" }}>
-              Your Gigs
+              Recent Orders
             </h2>
-            <Link to="/my-gigs" style={{ color: "#059669", fontSize: "0.95rem", textDecoration: "none", fontWeight: "600" }}>
+            <Link to="/my-sales" style={{ color: "#059669", fontSize: "0.95rem", textDecoration: "none", fontWeight: "600" }}>
               View all →
             </Link>
           </div>
-          <div style={{ textAlign: "center", padding: "48px 20px", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
-            <div style={{ fontSize: "3rem", marginBottom: "16px", filter: "grayscale(100%) opacity(50%)" }}>📭</div>
-            <p style={{ fontSize: "1rem", color: "#64748b", fontWeight: "500", margin: 0 }}>No gigs yet. Post your first gig to get started!</p>
-          </div>
+          
+          {analytics?.recentActivity?.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {analytics.recentActivity.map(order => (
+                <div key={order.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px", background: "#f8fafc", borderRadius: "12px", border: "1px solid #f1f5f9" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                     <img src={order.gig?.image || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=200"} 
+                          alt="gig thumbnail" style={{ width: "48px", height: "48px", objectFit: "cover", borderRadius: "8px" }} />
+                     <div>
+                       <p style={{ fontWeight: "700", color: "#1e293b", margin: 0, fontSize: "0.95rem" }}>{order.gig?.title}</p>
+                       <p style={{ color: "#64748b", margin: 0, fontSize: "0.85rem" }}>Ordered by <strong>{order.buyer?.username}</strong></p>
+                     </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                     <p style={{ fontWeight: "800", color: "#10b981", margin: 0, fontSize: "1.1rem" }}>${order.price}</p>
+                     <p style={{ color: "#64748b", margin: 0, fontSize: "0.8rem", textTransform: "uppercase", fontWeight: "600" }}>{order.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "48px 20px", background: "#f8fafc", borderRadius: "12px", border: "1px dashed #cbd5e1" }}>
+              <div style={{ fontSize: "3rem", marginBottom: "16px", filter: "grayscale(100%) opacity(50%)" }}>📭</div>
+              <p style={{ fontSize: "1rem", color: "#64748b", fontWeight: "500", margin: 0 }}>No orders yet. They will appear here once gig orders start rolling in.</p>
+            </div>
+          )}
         </div>
 
       </div>

@@ -19,6 +19,8 @@ import orderRoutes   from "./routes/orders.js";
 import adminRoutes   from "./routes/admin.js";
 import paymentRoutes from "./routes/payment.js";
 import messageRoutes from "./routes/messages.js";
+import conversationRoutes from "./routes/conversations.js";
+import analyticsRoutes from "./routes/analytics.js";
 
 dotenv.config();
 
@@ -105,6 +107,8 @@ app.use("/api/orders",   orderRoutes);
 app.use("/api/admin",    adminRoutes);
 app.use("/api/payment",  paymentRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/conversations", conversationRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 // ── Production Frontend Serving ────────────────────────────────────────────────
 if (process.env.NODE_ENV === "production") {

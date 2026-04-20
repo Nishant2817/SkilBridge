@@ -15,8 +15,11 @@ model User {
   role      String   @default("user")
   bio       String?
   image     String?
-  createdAt DateTime @default(now())
-  gigs      Gig[]
+  createdAt           DateTime       @default(now())
+  gigs                Gig[]
+  buyerConversations  Conversation[] @relation("BuyerConversations")
+  sellerConversations Conversation[] @relation("SellerConversations")
+  messages            Message[]
 }
 
 model Gig {
@@ -47,10 +50,27 @@ model Order {
   gig Gig @relation(fields: [gigId], references: [id])
 }
 
+model Conversation {
+  id        String    @id @default(cuid())
+  buyerId   Int
+  sellerId  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  buyer     User      @relation("BuyerConversations", fields: [buyerId], references: [id])
+  seller    User      @relation("SellerConversations", fields: [sellerId], references: [id])
+  messages  Message[]
+
+  @@unique([buyerId, sellerId])
+}
+
 model Message {
-  id         Int      @id @default(autoincrement())
-  senderId   Int
-  receiverId Int
-  text       String
-  createdAt  DateTime @default(now())
+  id             Int          @id @default(autoincrement())
+  conversationId String
+  senderId       Int
+  text           String
+  createdAt      DateTime     @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id])
 }

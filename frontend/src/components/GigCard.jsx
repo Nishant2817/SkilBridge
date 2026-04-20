@@ -15,7 +15,7 @@ const CATEGORY_COLORS = {
   "UI/UX": "#8b5cf6",
 };
 
-export default function GigCard({ gig }) {
+export default function GigCard({ gig, onDelete }) {
   const [liked, setLiked] = useState(false);
   const price = Number(gig.price) || 0;
   const hasImage = Boolean(gig.image);
@@ -196,6 +196,29 @@ export default function GigCard({ gig }) {
             View
           </Link>
         </div>
+
+        {/* Delete option for My Gigs */}
+        {onDelete && (
+          <button
+            onClick={() => onDelete(gig.id)}
+            style={{
+              marginTop: "8px",
+              width: "100%",
+              padding: "8px",
+              background: "#fee2e2",
+              color: "#dc2626",
+              border: "1px solid #fecaca",
+              borderRadius: "8px",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "background 0.2s",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#fecaca"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#fee2e2"}
+          >
+            🗑️ Delete Gig
+          </button>
+        )}
       </div>
     </div>
   );

@@ -23,19 +23,29 @@ export default function Profile() {
   const initials = profile?.username?.slice(0, 2).toUpperCase() || "??";
 
   return (
-    <div className="min-h-screen bg-slate-900 pt-28 pb-16 px-6">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-gray-50 pt-28 pb-16 px-6">
+      <div className="max-w-3xl mx-auto space-y-8">
+
+        {/* Page Title Header (matching My Gigs style) */}
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            My Profile
+          </h1>
+          <p className="text-gray-500">
+            View your personal details and quick links to your activity.
+          </p>
+        </div>
 
         {loading && (
-          <div className="space-y-4 animate-pulse">
-            <div className="h-32 w-32 rounded-full bg-slate-800 mx-auto" />
-            <div className="h-6 bg-slate-800 rounded w-48 mx-auto" />
-            <div className="h-4 bg-slate-800 rounded w-64 mx-auto" />
+          <div className="space-y-4 animate-pulse pt-4">
+            <div className="h-32 w-32 rounded-full bg-gray-200 mx-auto" />
+            <div className="h-6 bg-gray-200 rounded w-48 mx-auto" />
+            <div className="h-4 bg-gray-200 rounded w-64 mx-auto" />
           </div>
         )}
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-center">
+          <div className="bg-red-50 border border-red-200 text-red-500 p-4 rounded-xl text-center shadow-sm">
             {error}
           </div>
         )}
@@ -43,28 +53,28 @@ export default function Profile() {
         {!loading && !error && profile && (
           <>
             {/* Profile Card */}
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl">
+            <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
 
               {/* Banner */}
-              <div className="h-28 bg-gradient-to-r from-emerald-600/30 via-slate-800 to-violet-600/20" />
+              <div className="h-32 bg-gradient-to-r from-emerald-100 via-emerald-50 to-teal-50" />
 
               {/* Avatar + Info */}
-              <div className="px-8 pb-8">
-                <div className="flex items-end justify-between -mt-14 mb-6 flex-wrap gap-4">
+              <div className="px-8 pb-8 relative">
+                <div className="flex items-end justify-between -mt-16 mb-6 flex-wrap gap-4">
                   <div className="relative">
                     {profile.image ? (
                       <img
                         src={profile.image}
                         alt={profile.username}
-                        className="w-24 h-24 rounded-full object-cover border-4 border-slate-800 shadow-xl"
+                        className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md bg-white"
                       />
                     ) : (
-                      <div className="w-24 h-24 rounded-full border-4 border-slate-800 bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center text-2xl font-bold text-white shadow-xl">
+                      <div className="w-32 h-32 rounded-full border-4 border-white shadow-md bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-4xl font-bold text-white">
                         {initials}
                       </div>
                     )}
                     {profile.isSeller && (
-                      <span className="absolute -bottom-1 -right-1 bg-green-500 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full border-2 border-slate-800">
+                      <span className="absolute bottom-2 -right-2 bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full border-2 border-white shadow-sm">
                         SELLER
                       </span>
                     )}
@@ -72,34 +82,36 @@ export default function Profile() {
 
                   <Link
                     to="/profile/edit"
-                    className="px-5 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white font-semibold text-sm hover:bg-slate-600 transition-colors"
+                    className="px-5 py-2.5 bg-white border border-gray-200 rounded-full text-gray-700 font-semibold text-sm hover:border-emerald-500 hover:text-emerald-600 shadow-sm transition-all hover:shadow-md"
                   >
                     ✏️ Edit Profile
                   </Link>
                 </div>
 
-                <h1 className="text-2xl font-bold text-white mb-1">{profile.username}</h1>
-                <p className="text-gray-400 text-sm mb-4">{profile.email}</p>
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">{profile.username}</h1>
+                <p className="text-gray-500 text-sm mb-6">{profile.email}</p>
 
                 {profile.bio ? (
-                  <p className="text-gray-300 leading-relaxed text-sm mb-6 max-w-xl">{profile.bio}</p>
+                  <p className="text-gray-700 leading-relaxed text-[15px] mb-8 max-w-2xl bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    {profile.bio}
+                  </p>
                 ) : (
-                  <p className="text-gray-600 italic text-sm mb-6">
+                  <p className="text-gray-400 italic text-sm mb-8 bg-gray-50 p-4 rounded-xl border border-gray-100 inline-block">
                     No bio yet.{" "}
-                    <Link to="/profile/edit" className="text-green-400 hover:underline">Add one →</Link>
+                    <Link to="/profile/edit" className="text-emerald-500 hover:text-emerald-600 font-medium hover:underline">Add one →</Link>
                   </p>
                 )}
 
                 {/* Stats row */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-gray-100 pt-6">
                   {[
                     { label: "Role",    value: profile.role === "admin" ? "Admin" : (profile.isSeller ? "Seller" : "Buyer") },
                     { label: "Member since", value: joinedYear },
-                    { label: "Account", value: profile.isSeller ? "Seller" : "Buyer" },
+                    { label: "Account Status", value: profile.isActive !== false ? "Active" : "Suspended" },
                   ].map((stat) => (
-                    <div key={stat.label} className="bg-slate-900 border border-slate-700 rounded-xl p-4 text-center">
-                      <p className="text-white font-semibold text-sm">{stat.value}</p>
-                      <p className="text-gray-500 text-xs mt-1">{stat.label}</p>
+                    <div key={stat.label} className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-center hover:shadow-sm transition-shadow">
+                      <p className="text-gray-900 font-bold text-lg mb-1">{stat.value}</p>
+                      <p className="text-gray-500 text-xs uppercase tracking-wider font-semibold">{stat.label}</p>
                     </div>
                   ))}
                 </div>
@@ -107,23 +119,35 @@ export default function Profile() {
             </div>
 
             {/* Quick Links */}
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              {[
-                { label: "My Orders",   icon: "📋", to: "/orders"   },
-                { label: "My Sales",    icon: "📈", to: "/my-sales" },
-              ].map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className="flex items-center gap-3 bg-slate-800 border border-slate-700 rounded-xl p-5 hover:border-green-500/40 hover:bg-slate-700/60 transition-all group"
-                >
-                  <span className="text-2xl">{item.icon}</span>
-                  <span className="text-white font-semibold group-hover:text-green-400 transition-colors">
-                    {item.label}
-                  </span>
-                  <span className="ml-auto text-gray-600 group-hover:text-green-400">→</span>
-                </Link>
-              ))}
+            <div className="mt-8">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 px-1">Quick Links</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {[
+                  { label: "My Orders",   icon: "📋", to: "/orders", desc: "Track and manage your purchases" },
+                  { label: "My Sales",    icon: "📈", to: "/my-sales", desc: "View your gig earnings and fulfillment" },
+                ].map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className="flex items-center gap-4 bg-white border border-gray-100 rounded-2xl p-5 hover:border-emerald-300 hover:shadow-md transition-all group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 text-2xl flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-100 transition-transform">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-gray-900 font-bold group-hover:text-emerald-600 transition-colors">
+                        {item.label}
+                      </h4>
+                      <p className="text-gray-500 text-xs mt-1">
+                        {item.desc}
+                      </p>
+                    </div>
+                    <span className="ml-auto text-gray-400 group-hover:text-emerald-500 group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </div>
           </>
         )}

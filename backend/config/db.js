@@ -17,7 +17,10 @@ const poolConfig = {
 };
 
 // Platforms like Render require SSL for database connections
-if (process.env.NODE_ENV === "production") {
+const isProduction = process.env.NODE_ENV === "production";
+const isRemoteDB = process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("localhost");
+
+if (isProduction || isRemoteDB) {
   poolConfig.ssl = { rejectUnauthorized: false };
 }
 

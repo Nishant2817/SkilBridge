@@ -515,6 +515,7 @@ export default function Navbar() {
                       {/* Standard links */}
                       {[
                         { label: "Profile", icon: "👤", path: "/profile" },
+                        { label: "Messages", icon: "💬", path: "/messages" },
                         { label: "My Orders", icon: "📋", path: "/orders" },
                         ...(isSeller ? [{ label: "My Gigs", icon: "💼", path: "/my-gigs" }] : []),
                       ].map((item) => (

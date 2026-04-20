@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getGigById } from "../api/gigs";
 import { createOrder } from "../api/orders";
+import { createConversation } from "../api/messages";
 import { useAuth } from "../context/AuthContext";
 
 const CATEGORY_ICONS = {
@@ -17,7 +18,7 @@ const CATEGORY_ICONS = {
 
 export default function GigDetail() {
   const { id } = useParams();
-  const { user, isAuthenticated, openAuthModal } = useAuth();
+  const { user, isAuthenticated, openAuthModal, token } = useAuth();
   const navigate = useNavigate();
 
   const [gig, setGig] = useState(null);
@@ -221,9 +222,14 @@ export default function GigDetail() {
             {/* Contact Seller CTA below the card */}
             <div className="mt-4">
               <button 
-                onClick={() => {
+                onClick={async () => {
                   if (!isAuthenticated) { openAuthModal("login"); return; }
-                  navigate(`/chat/${gig.user?.id}`);
+                  try {
+                    const conv = await createConversation(gig.user?.id, token);
+                    navigate(`/messages?c=${conv.id}`);
+                  } catch (err) {
+                     console.error("Failed to start chat", err);
+                  }
                 }}
                 className="w-full bg-white border border-[#222325] hover:bg-[#222325] hover:text-white text-[#222325] font-bold py-3.5 rounded text-[15px] transition-colors"
                >
