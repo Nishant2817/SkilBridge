@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.js";
 import { verifySeller } from "../middleware/verifySeller.js";
+import { requireFields } from "../middleware/validate.js";
 import { getAllGigs, getGigById, createGig, deleteGig } from "../controllers/gigController.js";
 
 const router = Router();
@@ -11,8 +12,8 @@ router.get("/", getAllGigs);
 // GET /api/gigs/:id
 router.get("/:id", getGigById);
 
-// POST /api/gigs  — seller only
-router.post("/", authenticate, verifySeller, createGig);
+// POST /api/gigs  — seller only (validates required fields before hitting the DB)
+router.post("/", authenticate, verifySeller, requireFields(["title", "description", "price", "category", "image"]), createGig);
 
 // DELETE /api/gigs/:id  — owner only
 router.delete("/:id", authenticate, deleteGig);

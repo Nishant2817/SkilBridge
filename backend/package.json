@@ -1,7 +1,7 @@
 {
-  "name": "fiverr-app-backend",
+  "name": "skillbridge-backend",
   "version": "1.0.0",
-  "description": "Express + PostgreSQL backend for Fiverr-like marketplace",
+  "description": "Express.js + Prisma + Socket.io backend for SkillBridge freelancing platform",
   "main": "server.js",
   "type": "module",
   "scripts": {
