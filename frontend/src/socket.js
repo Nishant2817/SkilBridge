@@ -8,7 +8,8 @@ let socket = null;
  */
 export function getSocket(token) {
   if (!socket || socket.disconnected) {
-    socket = io("http://localhost:5000", {
+    const socketUrl = import.meta.env.PROD ? window.location.origin : "http://localhost:5000";
+    socket = io(socketUrl, {
       auth: { token },
       autoConnect: true,
       transports: ["websocket"],

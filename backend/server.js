@@ -3,6 +3,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import jwt from "jsonwebtoken";
 import prisma from "./config/db.js";
 
@@ -24,7 +29,7 @@ const PORT       = process.env.PORT || 5000;
 // ── Socket.io ────────────────────────────────────────────────────────────────
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: process.env.NODE_ENV === "production" ? true : "http://localhost:5173",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -84,7 +89,10 @@ io.on("connection", (socket) => {
 });
 
 // ── Express middleware ────────────────────────────────────────────────────────
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ 
+  origin: process.env.NODE_ENV === "production" ? true : "http://localhost:5173", 
+  credentials: true 
+}));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
@@ -97,6 +105,14 @@ app.use("/api/orders",   orderRoutes);
 app.use("/api/admin",    adminRoutes);
 app.use("/api/payment",  paymentRoutes);
 app.use("/api/messages", messageRoutes);
+
+// ── Production Frontend Serving ────────────────────────────────────────────────
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../frontend/dist", "index.html"));
+  });
+}
 
 // ── Global error handler ──────────────────────────────────────────────────────
 app.use((err, req, res, next) => {
