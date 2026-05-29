@@ -258,6 +258,6 @@ This project is licensed under the **MIT License** — see [LICENSE](LICENSE) fo
 
 <div align="center">
 
-Made with ❤️ by [Akshita Syal](https://github.com/akshitasyal) & [Chetan Chauhan](https://github.com/Chetan6969)
+Made with ❤️ by [Akshita Syal](https://github.com/akshitasyal) , [Chetan Chauhan](https://github.com/Chetan6969) & [Nishant Pandey](https://github.com/Nishant2817)
 
 </div>
